@@ -1,14 +1,20 @@
 <script setup>
 import HeartIcon from "./icons/HeartIcon.vue";
+import { ref } from "vue";
 
-const { currentScore = 100 } = defineProps({
-	currentScore: Number,
+const props = defineProps({
+	currentScore: {
+		type: Number,
+		default: 100,
+	},
 });
+
+const scoreRef = ref(props.currentScore);
 </script>
 
 <template>
 	<div class="score">
-		{{ currentScore }}
+		{{ scoreRef }}
 		<HeartIcon />
 	</div>
 </template>

@@ -1,10 +1,39 @@
 <script setup>
+import { ref } from "vue";
 import CancelIcon from "./icons/CancelIcon.vue";
 import SuccessIcon from "./icons/SuccessIcon.vue";
 
+const props = defineProps({
+	word: {
+		type: String,
+		default: "unknown",
+	},
+	translation: {
+		type: String,
+		default: "?",
+	},
+	initialState: {
+		type: String,
+		default: "closed",
+		validator: (v) => ["closed", "opened"].includes(v),
+	},
+	initialStatus: {
+		type: String,
+		default: "pending",
+		validator: (v) => ["pending", "success", "fail"].includes(v),
+	},
+});
+
 const emit = defineEmits({
 	flipCard: (payload) => typeof payload === "boolean" || payload === undefined,
-	changeStatus: (payload) => typeof payload === "string" && payload.trim() !== "",
+	changeStatus: (payload) => typeof payload === "string" && ["success", "fail"].includes(payload),
+});
+
+const card = ref({
+	word: props.word,
+	translation: props.translation,
+	state: props.initialState,
+	status: props.initialStatus,
 });
 
 const handleFlipCard = () => {

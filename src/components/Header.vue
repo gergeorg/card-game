@@ -10,7 +10,7 @@ const data = {
 	<header class="header">
 		<div class="container header-container">
 			<h1 class="title">Запомни слово</h1>
-			<Score :data />
+			<Score :current-score="100" />
 		</div>
 	</header>
 </template>
