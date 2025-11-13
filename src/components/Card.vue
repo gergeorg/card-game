@@ -1,39 +1,83 @@
 <script setup>
+import { ref } from "vue";
 import CancelIcon from "./icons/CancelIcon.vue";
 import SuccessIcon from "./icons/SuccessIcon.vue";
 
+const props = defineProps({
+	word: {
+		type: String,
+		default: "unknown",
+	},
+	translation: {
+		type: String,
+		default: "?",
+	},
+	initialState: {
+		type: String,
+		default: "closed",
+		validator: (v) => ["closed", "opened"].includes(v),
+	},
+	initialStatus: {
+		type: String,
+		default: "pending",
+		validator: (v) => ["pending", "success", "fail"].includes(v),
+	},
+});
+
 const emit = defineEmits({
 	flipCard: (payload) => typeof payload === "boolean" || payload === undefined,
-	changeStatus: (payload) => typeof payload === "string" && payload.trim() !== "",
+	changeStatus: (payload) => typeof payload === "string" && ["success", "fail"].includes(payload),
+});
+
+const card = ref({
+	word: props.word,
+	translation: props.translation,
+	state: props.initialState,
+	status: props.initialStatus,
 });
 
 const handleFlipCard = () => {
-	emit("flipCard", true);
+	card.value.state = card.value.state === "closed" ? "opened" : "closed";
+	emit("flipCard", card.value.state === "opened");
 };
 
-const handleChangeStatus = () => {
-	console.log("ChangeStatus");
+const handleSuccess = () => {
+	card.value.status = "success";
+	emit("changeStatus", "success");
+};
+
+const handleFail = () => {
+	card.value.status = "fail";
+	emit("changeStatus", "fail");
 };
 </script>
 
 <template>
-	<div class="card" @click="handleFlipCard()">
+	<li class="card" @click="handleFlipCard()">
 		<div class="card-number">01</div>
-		<div class="card-content">unadmitted</div>
-		<div class="card-footer">
-			<span class="card-text">Перевенуть</span>
 
+		<SuccessIcon v-if="card.status === 'success'" class="card-icon-top" />
+		<CancelIcon v-else-if="card.status === 'fail'" class="card-icon-top" />
+
+		<div class="card-content">
+			{{ card.state === "closed" ? card.word : card.translation }}
+		</div>
+
+		<div v-if="card.state === 'opened'" class="card-footer">
+			<span class="card-text">Запомнил?</span>
 			<div class="card-buttons">
-				<button class="card-button">
+				<button class="card-button" @click.stop="handleFail()">
 					<CancelIcon />
 				</button>
-
-				<button class="card-button" @click="handleChangeStatus()">
+				<button class="card-button" @click.stop="handleSuccess()">
 					<SuccessIcon />
 				</button>
 			</div>
 		</div>
-	</div>
+		<div v-else class="card-footer">
+			<span class="card-text">Перевернуть</span>
+		</div>
+	</li>
 </template>
 
 <style scoped>
@@ -60,6 +104,17 @@ const handleChangeStatus = () => {
 	font-weight: 400;
 	font-size: 14px;
 	color: var(--color-text-card);
+	transition: background-color 0.3s ease-in-out;
+}
+
+.card-icon-top {
+	position: absolute;
+	top: 15px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 36px;
+	height: 36px;
+	background-color: var(--color-white);
 	transition: background-color 0.3s ease-in-out;
 }
 
@@ -121,6 +176,10 @@ const handleChangeStatus = () => {
 }
 
 .card:hover .card-footer {
+	background-color: var(--color-stroke);
+}
+
+.card:hover .card-icon-top {
 	background-color: var(--color-stroke);
 }
 </style>
