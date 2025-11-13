@@ -1,9 +1,5 @@
 <script setup>
 import Score from "../components/Score.vue";
-
-const data = {
-	currentScore: 100,
-};
 </script>
 
 <template>
